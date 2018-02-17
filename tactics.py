@@ -23,9 +23,16 @@ def tactics(adj_list):
     central_nodes = [k for k in sorted(centrality, key=centrality.get, reverse=True)]
     print('most central: {}'.format(','.join([central_nodes[i] for i in range(10)])))
 
-    clustering = nx.clustering(G)
+
+    clustering = nx.clustering(G, central_nodes[:10])
     cluster_nodes = [k for k in sorted(clustering, key=clustering.get, reverse=True)]
     print('highest clustering coefficient: {}'.format(','.join([cluster_nodes[i] for i in range(10)])))
+
+    best_boys = [(n, centrality[n] * clustering[n]) for n in central_nodes[:10]]
+    best_boys = sorted(best_boys, key=lambda t: t[1], reverse=True)
+    print(best_boys)
+
+
 
 
 if __name__ == '__main__':
