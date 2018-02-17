@@ -20,9 +20,12 @@ def tactics(adj_list):
     G = parse_graph(adj_list)
     print('Total number of nodes: {}'.format(G.number_of_nodes()))
     centrality = nx.eigenvector_centrality(G)
-    c_nodes = [k for k in sorted(centrality, key=centrality.get, reverse=True)]
-    for i in range(10):
-        print(c_nodes[i])
+    central_nodes = [k for k in sorted(centrality, key=centrality.get, reverse=True)]
+    print('most central: {}'.format(','.join([central_nodes[i] for i in range(10)])))
+
+    clustering = nx.clustering(G)
+    cluster_nodes = [k for k in sorted(clustering, key=clustering.get, reverse=True)]
+    print('highest clustering coefficient: {}'.format(','.join([cluster_nodes[i] for i in range(10)])))
 
 
 if __name__ == '__main__':
