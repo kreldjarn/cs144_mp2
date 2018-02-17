@@ -5,6 +5,9 @@
 import sys
 import json
 
+# Local dependencies
+import sim
+
 # Third-party dependencies
 # ========================
 import networkx as nx
@@ -32,6 +35,9 @@ def tactics(adj_list):
     best_boys = sorted(best_boys, key=lambda t: t[1], reverse=True)
     print(best_boys)
 
+
+def simulate(adj_list, best_boys, seeds):
+    pass
 
 
 
