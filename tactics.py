@@ -5,6 +5,7 @@
 import sys
 import json
 import random
+import math
 
 # Local dependencies
 import sim
@@ -27,9 +28,9 @@ def selector(G,num_seeds,best_boys):
     i=1
     seeds = []
     while len(seeds) < num_seeds:
-        if random.random() < 1: #0.8:
+        if random.random() < 0.8:
             seeds.append(focus)
-        seeds.extend([n for n in G[focus] if random.random() < 1])
+        seeds.extend([n for n in G[focus] if random.random() < 0.8])
         seeds = seeds[:num_seeds]
         focus = best_boys[i][0]
         i += 1
@@ -66,9 +67,32 @@ def tactics_1st_gen(adj_list, num_seeds, n_players):
 def tactics_2nd_gen(adj_list, num_seeds, n_players):
     G = parse_graph(adj_list)
     degrees = G.degree()
-    print(degrees)
-    print(G.degree(['1']))
-    top_degree = [k for k in sorted(degree, key=lambda t: t[1], reverse=True)]
+    top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
+
+    TA_set = set(top_degree[:num_seeds])
+
+    final_seeds = []
+    for i in range(50):
+        idx = 0
+        seeds = []
+        while len(seeds) < num_seeds:
+            seeds.append(top_degree[idx])
+            nbrs = list(set(G[top_degree[idx]]) - set(seeds))
+
+            TA_intersect = set(nbrs) & TA_set
+            n_nbrs = len(TA_intersect) + 1
+
+            # n_nbrs = int(math.floor(len(G[top_degree[idx]]) / 2) + 1)
+            seeds.extend(np.random.choice(nbrs, size=n_nbrs))
+            seeds = seeds[:num_seeds]
+            idx += 1
+        final_seeds.extend(seeds)
+    print(len(final_seeds))
+    with open(sys.argv[2], 'w') as fh:
+        fh.write('\n'.join(final_seeds))
+
+
+
 
 
 if __name__ == '__main__':
