@@ -9,11 +9,17 @@ import math
 
 # Local dependencies
 import sim
+from look_around_you import look_around_you
 
 # Third-party dependencies
 # ========================
 import networkx as nx
 import numpy as np
+
+def print_to_file(seeds, filename):
+    print('Printing {} lines to file {}'.format(len(seeds), filename))
+    with open(filename, 'w') as fh:
+        fh.write('\n'.join(seeds))
 
 def parse_graph(adj_list):
     G = nx.Graph()
@@ -91,48 +97,53 @@ def tactics_2nd_gen(adj_list, num_seeds, n_players):
     with open(sys.argv[2], 'w') as fh:
         fh.write('\n'.join(final_seeds))
 
-def look_around_you(adj_list, num_seeds, n_players):
+def tactics_degree(adj_list, num_seeds, n_players):
     G = parse_graph(adj_list)
     degrees = G.degree()
     top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
 
-    TA_set = set(top_degree[:num_seeds])
-    reach = dict()
-    for TA_seed in TA_set:
-        reach = update_reach(G, reach, TA_seed)
-    
-    taken = TA_set
-    our_choices = list()
-    for i in range(num_seeds):
-        new_node = highest_value_node(G, reach)
-        reach = update_reach(G, reach, new_node)
-        our_choices.append(new_node)
-    with open(sys.argv[2], 'w') as fh:
-        fh.write('\n'.join(our_choices))
+    TA_set = top_degree[:num_seeds]
+    neighbors_of_top_dog = G[TA_set[0]]
+    top_neighbors = [t for t in TA_set if t in neighbors_of_top_dog]
+    seeds = TA_set[:num_seeds-1]
 
-def highest_value_node(G, reach):
-    max_val = -1
-    max_node = None
-    for node in G.nodes():
-        new_val = node_value(G, reach, node)
-        if new_val > max_val:
-            max_val = new_val
-            max_node = node
-    return max_node
-    
-def update_reach(G, reach, newnode):
-    new_reach = G.shortest_path_length(source = newnode)
-    for node in new_reach:
-        reach[node] = min(reach[node], new_reac[node])
-    return reach
+    TA_set = top_degree[:num_seeds]
+    best = 0
+    final_seeds = []
+    for n in G[TA_set[0]]:
+        simulation = sim.run(adj_list, {'us': seeds + [n], 'them': TA_set})
+        if simulation['us'] > best:
+            print('{} -> {}'.format(best, simulation['us']))
+            best = simulation['us']
+            final_seeds = seeds + [n]
 
-def node_value(G, reach, node):
-    new_reach = G.shortest_path_length(source = node)
-    result = 0
-    for node in new_reach:
-        if(reach[node] > new_reach[node]):
-            result += 1
-    return result
+
+    print(sim.run(adj_list, {'us': final_seeds, 'them': TA_set}))
+    print_to_file(final_seeds * 50, sys.argv[2])
+
+def tactics_fewer(adj_list, num_seeds, n_players):
+    G = parse_graph(adj_list)
+    degrees = G.degree()
+    top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
+
+    TA_set = top_degree[:num_seeds - 2]
+
+    neighbors_of_top_dog = G[TA_set[0]]
+    # nbrs = [k[0] for k in sorted(G.degree(G[TA_set[0]]), key=lambda t: t[1], reverse=True) if k[0] not in seeds and k[0] not in TA_set]
+
+    # seeds.append(nbrs[0])
+
+    seeds = set(TA_set)
+    nbrs = [k[0] for k in sorted(G.degree(G[TA_set[0]]), key=lambda t: t[1], reverse=True)]
+    i = 0
+    while len(seeds) < num_seeds:
+        seeds.add(nbrs[i])
+        i += 1
+
+    seeds = list(seeds)
+    print(sim.run(adj_list, {'us': seeds, 'them': TA_set}))
+    print_to_file(seeds * 50, sys.argv[2])
+
 
 
 
@@ -140,7 +151,7 @@ if __name__ == '__main__':
     try:
         with open(sys.argv[1], 'r') as fh:
             adj_list = json.loads(fh.read())
-        tactics_2nd_gen(adj_list, int(sys.argv[3]), int(sys.argv[4]))
+        tactics_fewer(adj_list, int(sys.argv[3]), int(sys.argv[4]))
     except IndexError as e:
         print('FEED ME A GRAPH')
         print('     (ಠ‿ಠ)     ')
