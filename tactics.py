@@ -99,7 +99,7 @@ if __name__ == '__main__':
     try:
         with open(sys.argv[1], 'r') as fh:
             adj_list = json.loads(fh.read())
-        tactics_1st_gen(adj_list, int(sys.argv[3]), int(sys.argv[4]))
+        tactics_2nd_gen(adj_list, int(sys.argv[3]), int(sys.argv[4]))
     except IndexError as e:
         print('FEED ME A GRAPH')
         print('     (ಠ‿ಠ)     ')
