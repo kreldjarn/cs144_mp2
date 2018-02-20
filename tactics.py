@@ -43,7 +43,7 @@ def selector(G,num_seeds,best_boys):
     return seeds
 
 
-def tactics_1st_gen(adj_list, num_seeds, n_players):
+def tactics_1st_gen(adj_list, outfile, num_seeds, n_players):
     N = 100
     G = parse_graph(adj_list)
     print('Total number of nodes: {}'.format(G.number_of_nodes()))
@@ -67,10 +67,9 @@ def tactics_1st_gen(adj_list, num_seeds, n_players):
         final_selections.extend(selections[best])
     print(final_selections)
     print(len(final_selections))
-    with open(sys.argv[2], 'w') as fh:
-        fh.write('\n'.join(final_selections))
+    print_to_file(final_selections, outfile)
 
-def tactics_2nd_gen(adj_list, num_seeds, n_players):
+def tactics_2nd_gen(adj_list, outfile, num_seeds, n_players):
     G = parse_graph(adj_list)
     degrees = G.degree()
     top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
@@ -94,10 +93,9 @@ def tactics_2nd_gen(adj_list, num_seeds, n_players):
             idx += 1
         final_seeds.extend(seeds)
     print(len(final_seeds))
-    with open(sys.argv[2], 'w') as fh:
-        fh.write('\n'.join(final_seeds))
+    print_to_file(final_seeds, outfile)
 
-def tactics_degree(adj_list, num_seeds, n_players):
+def tactics_degree(adj_list, outfile, num_seeds, n_players):
     G = parse_graph(adj_list)
     degrees = G.degree()
     top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
@@ -121,7 +119,7 @@ def tactics_degree(adj_list, num_seeds, n_players):
     print(sim.run(adj_list, {'us': final_seeds, 'them': TA_set}))
     print_to_file(final_seeds * 50, sys.argv[2])
 
-def tactics_fewer(adj_list, num_seeds, n_players):
+def tactics_fewer(adj_list, outfile, num_seeds, n_players):
     G = parse_graph(adj_list)
     degrees = G.degree()
     top_degree = [k[0] for k in sorted(degrees, key=lambda t: t[1], reverse=True)]
@@ -142,16 +140,26 @@ def tactics_fewer(adj_list, num_seeds, n_players):
 
     seeds = list(seeds)
     print(sim.run(adj_list, {'us': seeds, 'them': TA_set}))
-    print_to_file(seeds * 50, sys.argv[2])
+    print_to_file(seeds * 50, outfile)
 
 
 
 
 if __name__ == '__main__':
+    funcs = {
+        '1st_gen': tactics_1st_gen,
+        '2nd_gen': tactics_2nd_gen,
+        'fewer': tactics_fewer,
+        'degree': tactics_degree
+    }
+
     try:
-        with open(sys.argv[1], 'r') as fh:
+        with open(sys.argv[2], 'r') as fh:
             adj_list = json.loads(fh.read())
-        tactics_fewer(adj_list, int(sys.argv[3]), int(sys.argv[4]))
+        funcs[sys.argv[1]](adj_list,
+                           'results/{}'.format(sys.argv[2].split('/')[1]),
+                           int(sys.argv[3]),
+                           int(sys.argv[4]))
     except IndexError as e:
         print('FEED ME A GRAPH')
         print('     (ಠ‿ಠ)     ')
