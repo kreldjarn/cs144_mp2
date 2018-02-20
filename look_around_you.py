@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from sim import*
 import sys
 import json
 
@@ -49,6 +50,12 @@ def look_around_you(adj_list, outfile, n_seeds, n_players):
         new_node = highest_value_node(G, reach)
         reach = update_reach(G, reach, new_node)
         our_choices.append(new_node)
+    
+    #testing
+    node_mappings = dict()
+    node_mappings["good guys"] = our_choices
+    node_mappings["bad guys"] = TA_set
+    print(run(adj_list, node_mappings))
     with open(outfile, 'w') as fh:
         fh.write('\n'.join(our_choices))
 
@@ -75,4 +82,3 @@ def node_value(G, reach, node):
         if(reach.get(node, float("inf")) > new_reach[node]):
             result += 1
     return result
-
