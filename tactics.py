@@ -152,7 +152,8 @@ if __name__ == '__main__':
         '1st_gen': tactics_1st_gen,
         '2nd_gen': tactics_2nd_gen,
         'fewer': tactics_fewer,
-        'degree': tactics_degree
+        'degree': tactics_degree,
+        'lookaround': look_around_you
     }
 
     try:
@@ -170,5 +171,6 @@ if __name__ == '__main__':
                            n_seeds,
                            n_players)
     except IndexError as e:
+        print(e)
         print('FEED ME A GRAPH')
         print('     (ಠ‿ಠ)     ')
