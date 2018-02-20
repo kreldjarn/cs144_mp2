@@ -124,13 +124,13 @@ def update(adj_list, node_color, node):
   Updates each node based on its neighbors.
   """
   neighbors = adj_list[node]
-  colored_neighbors = filter(None, [node_color[x] for x in neighbors])
+  colored_neighbors = list(filter(None, [node_color[x] for x in neighbors]))
   team_count = Counter(colored_neighbors)
   if node_color[node] is not None:
     team_count[node_color[node]] += 1.5
   most_common = team_count.most_common(1)
   if len(most_common) > 0 and \
-    most_common[0][1] > len(colored_neighbors) / 2.0:
+    most_common[0][1] > (len(colored_neighbors) + (1.5 if node_color[node] is not None else 0)) / 2.0:
     return (True, most_common[0][0])
 
   return (False, node_color[node])
@@ -168,4 +168,4 @@ def get_result(colors, node_color):
 
 
 if __name__ == '__main__':
-  print USAGE
+  print(USAGE)
