@@ -146,6 +146,12 @@ def tactics_fewer(adj_list, outfile, num_seeds, n_players):
 
 
 if __name__ == '__main__':
+    """
+    Usage:
+
+    python3 tactics.py name_of_strategy input_file number_of_seeds number_of_players
+
+    """
     funcs = {
         '1st_gen': tactics_1st_gen,
         '2nd_gen': tactics_2nd_gen,
