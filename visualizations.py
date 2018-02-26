@@ -230,7 +230,7 @@ with open('test_data/2.10.31-LBMK.json') as fh:
     TA_adj_list = json.load(fh)
     TA_set=TA_adj_list["TA_more"]
    
-#print(sim.run(adj_list, {'us': ['1','2','3','4','5'], 'them': ['2','4','6','8','10']}))   
+print(sim.run(adj_list, {'us': final_seeds, 'them': TA_set}))   
 print_to_file(list(traverse(final_seeds)), 'results/8.30.1.txt')
   
 # 2.10.32, p=0.5 s1
